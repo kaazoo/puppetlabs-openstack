@@ -9,6 +9,8 @@ class openstack::profile::neutron::server {
   $tenant_network_type           = $::openstack::config::neutron_tenant_network_type # ['gre']
   $type_drivers                  = $::openstack::config::neutron_type_drivers # ['gre']
   $mechanism_drivers             = $::openstack::config::neutron_mechanism_drivers # ['openvswitch']
+  $flat_networks                 = $::openstack::config::neutron_flat_networks # ['physnet1']
+  $network_vlan_ranges           = $::openstack::config::neutron_network_vlan_ranges # ['physnet1:1000:1100'],
   $tunnel_id_ranges              = $::openstack::config::neutron_tunnel_id_ranges # ['1:1000']
   $controller_management_address = $::openstack::config::controller_address_management
 
@@ -17,6 +19,8 @@ class openstack::profile::neutron::server {
       type_drivers         => $type_drivers,
       tenant_network_types => $tenant_network_type,
       mechanism_drivers    => $mechanism_drivers,
+      flat_networks        => $flat_networks,
+      network_vlan_ranges  => $network_vlan_ranges,
       tunnel_id_ranges     => $tunnel_id_ranges
     }
   } elsif ($::openstack::config::neutron_core_plugin == 'plumgrid') {

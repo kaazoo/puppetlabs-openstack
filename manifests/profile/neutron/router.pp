@@ -7,19 +7,30 @@ class openstack::profile::neutron::router {
   $controller_management_address = $::openstack::config::controller_address_management
 
   include ::openstack::common::neutron
-  include ::openstack::common::ml2::ovs
+
+  if ('linuxbridge' in $::openstack::config::neutron_mechanism_drivers) {
+    include ::openstack::common::ml2::linuxbridge
+    $external_network_bridge = ''
+    $interface_driver = 'neutron.agent.linux.interface.BridgeInterfaceDriver'
+  } else {
+    include ::openstack::common::ml2::ovs
+    $external_network_bridge = 'brex'
+    $interface_driver = 'neutron.agent.linux.interface.OVSInterfaceDriver'
+  }
 
 
   ### Router service installation
   class { '::neutron::agents::l3':
     debug                   => $::openstack::config::debug,
-    external_network_bridge => 'brex',
+    external_network_bridge => $external_network_bridge,
+    interface_driver        => $interface_driver,
     enabled                 => true,
   }
 
   class { '::neutron::agents::dhcp':
-    debug   => $::openstack::config::debug,
-    enabled => true,
+    debug            => $::openstack::config::debug,
+    interface_driver => $interface_driver,
+    enabled          => true,
   }
 
   class { '::neutron::agents::metadata':
@@ -33,42 +44,46 @@ class openstack::profile::neutron::router {
   }
 
   class { '::neutron::agents::lbaas':
-    debug   => $::openstack::config::debug,
-    enabled => true,
+    debug            => $::openstack::config::debug,
+    interface_driver => $interface_driver,
+    enabled          => true,
   }
 
   class { '::neutron::agents::vpnaas':
-    enabled => true,
+    interface_driver => $interface_driver,
+    enabled          => true,
   }
 
   class { '::neutron::agents::metering':
-    enabled => true,
+    interface_driver => $interface_driver,
+    enabled          => true,
   }
 
   class { '::neutron::services::fwaas':
     enabled => true,
   }
 
-  $external_bridge = 'brex'
-  $external_network = $::openstack::config::network_external
-  $external_device = device_for_network($external_network)
-  vs_bridge { $external_bridge:
-    ensure => present,
-  }
-  if $external_device != $external_bridge {
-    vs_port { $external_device:
+  if ('ovs' in $::openstack::config::neutron_mechanism_drivers) {
+    $external_network = $::openstack::config::network_external
+    $external_device = device_for_network($external_network)
+    vs_bridge { $external_network_bridge:
       ensure => present,
-      bridge => $external_bridge,
     }
-  } else {
-    # External bridge already has the external device's IP, thus the external
-    # device has already been linked
-  }
+     if $external_device != $external_network_bridge {
+      vs_port { $external_device:
+        ensure => present,
+        bridge => $external_network_bridge,
+      }
+    } else {
+      # External bridge already has the external device's IP, thus the external
+      # device has already been linked
+    }
 
-  $defaults = { 'ensure' => 'present' }
-  create_resources('neutron_network', $::openstack::config::networks, $defaults)
-  create_resources('neutron_subnet', $::openstack::config::subnets, $defaults)
-  create_resources('neutron_router', $::openstack::config::routers, $defaults)
-  create_resources('neutron_router_interface', $::openstack::config::router_interfaces, $defaults)
+    $defaults = { 'ensure' => 'present' }
+    create_resources('neutron_network', $::openstack::config::networks, $defaults)
+    create_resources('neutron_subnet', $::openstack::config::subnets, $defaults)
+    create_resources('neutron_router', $::openstack::config::routers, $defaults)
+    create_resources('neutron_router_interface', $::openstack::config::router_interfaces, $defaults)
+  }
 
 }
