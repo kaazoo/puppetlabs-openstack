@@ -29,7 +29,7 @@
 #     {
 #       'public' => {
 #         'tenant_name'              => 'services',
-#         'provider_network_type'    => 'gre',
+#         'provider_network_types'   => 'gre',
 #         'router_external'          => true,
 #         'provider_segmentation_id' => 3604,
 #         'shared'                   => true,
@@ -261,8 +261,8 @@
 #   Array. Tunnel types to use
 #   Defaults to ['gre'],
 #
-# [*neutron_tenant_network_type*] (Deprecated)
-#   Array. Tenant network type.
+# [*neutron_tenant_network_types*] (Deprecated)
+#   Array. Tenant network types.
 #   Defaults to ['gre'],
 #
 # [*neutron_type_drivers*] (Deprecated)
@@ -430,7 +430,7 @@ class openstack (
   $plumgrid_password = undef,
   $neutron_tunneling = true,
   $neutron_tunnel_types = ['gre'],
-  $neutron_tenant_network_type = ['gre'],
+  $neutron_tenant_network_types = ['gre'],
   $neutron_type_drivers = ['gre'],
   $neutron_mechanism_drivers = ['openvswitch'],
   $neutron_tunnel_id_ranges = ['1:1000'],
@@ -522,7 +522,7 @@ class openstack (
       plumgrid_password             => hiera(openstack::neutron::plumgrid_password, undef),
       neutron_tunneling             => hiera(openstack::neutron::tunneling, $neutron_tunneling),
       neutron_tunnel_types          => hiera(openstack::neutron::tunnel_type, $neutron_tunnel_types),
-      neutron_tenant_network_type   => hiera(openstack::neutron::tenant_network_type, $neutron_tenant_network_type),
+      neutron_tenant_network_types  => hiera(openstack::neutron::tenant_network_types, $neutron_tenant_network_types),
       neutron_type_drivers          => hiera(openstack::neutron::type_drivers, $neutron_type_drivers),
       neutron_mechanism_drivers     => hiera(openstack::neutron::mechanism_drivers, $neutron_mechanism_drivers),
       neutron_tunnel_id_ranges      => hiera(openstack::neutron::tunnel_id_ranges, $neutron_tunnel_id_ranges),
@@ -619,7 +619,7 @@ class openstack (
       plumgrid_password             => $plumgrid_password,
       neutron_tunneling             => $neutron_tunneling,
       neutron_tunnel_types          => $neutron_tunnel_types,
-      neutron_tenant_network_type   => $neutron_tenant_network_type,
+      neutron_tenant_network_types  => $neutron_tenant_network_types,
       neutron_type_drivers          => $neutron_type_drivers,
       neutron_mechanism_drivers     => $neutron_mechanism_drivers,
       neutron_tunnel_id_ranges      => $neutron_tunnel_id_ranges,

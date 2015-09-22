@@ -64,7 +64,7 @@ class openstack::config (
   ],
   $neutron_tunneling = undef,
   $neutron_tunnel_types = undef,
-  $neutron_tenant_network_type = undef,
+  $neutron_tenant_network_types = undef,
   $neutron_type_drivers = undef,
   $neutron_mechanism_drivers = undef,
   $neutron_tunnel_id_ranges = undef,

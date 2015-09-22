@@ -6,7 +6,7 @@ class openstack::profile::neutron::server {
 
   include ::openstack::common::neutron
 
-  $tenant_network_type           = $::openstack::config::neutron_tenant_network_type # ['gre']
+  $tenant_network_types          = $::openstack::config::neutron_tenant_network_types # ['gre']
   $type_drivers                  = $::openstack::config::neutron_type_drivers # ['gre']
   $mechanism_drivers             = $::openstack::config::neutron_mechanism_drivers # ['openvswitch']
   $flat_networks                 = $::openstack::config::neutron_flat_networks # ['physnet1']
@@ -17,7 +17,7 @@ class openstack::profile::neutron::server {
   if ($::openstack::config::neutron_core_plugin == 'ml2') {
     class  { '::neutron::plugins::ml2':
       type_drivers         => $type_drivers,
-      tenant_network_types => $tenant_network_type,
+      tenant_network_types => $tenant_network_types,
       mechanism_drivers    => $mechanism_drivers,
       flat_networks        => $flat_networks,
       network_vlan_ranges  => $network_vlan_ranges,
